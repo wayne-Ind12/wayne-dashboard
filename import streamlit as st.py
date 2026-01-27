@@ -91,4 +91,5 @@ if st.session_state.historial:
 else:
     st.info("Aún no has registrado propiedades en esta sesión.")
 
-st.caption("Wayne Capital Uruguay - Sistema de Intelig
+st.caption("Wayne Capital Uruguay - Sistema de Inteligencia Inmobiliaria")
+
