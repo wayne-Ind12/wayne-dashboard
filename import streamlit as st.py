@@ -1,46 +1,94 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from datetime import datetime
 
-# Título de la App
-st.title("🦇 Wayne Real Estate - Base de Datos")
+# 1. CONFIGURACIÓN DE LA NAVE MISTERIOSA
+st.set_page_config(page_title="Wayne Capital - MVD Radar", layout="wide", page_icon="🦇")
 
-# --- ENTRADA DE DATOS ---
-with st.form("registro_propiedad"):
-    st.write("Registrar nueva oportunidad detectada")
-    f_barrio = st.selectbox("Barrio", ["Pocitos", "Centro", "Carrasco", "Cordón", "Prado"])
-    f_precio = st.number_input("Precio (USD)", value=100000)
-    f_m2 = st.number_input("Metros", value=40)
-    
-    boton_guardar = st.form_submit_button("Guardar en la Nube")
+# Estilo personalizado con CSS
+st.markdown("""
+    <style>
+    .main { background-color: #0e1117; }
+    .stMetric { background-color: #1a1c23; padding: 15px; border-radius: 10px; border: 1px solid #00ff00; }
+    </style>
+    """, unsafe_allow_html=True)
 
-# --- LÓGICA DE GUARDADO ---
-if boton_guardar:
-    # Creamos la nueva fila
-    nueva_fila = {
-        "Fecha": datetime.now().strftime("%d/%m/%Y %H:%M"),
-        "Barrio": f_barrio,
-        "Precio": f_precio,
-        "m2": f_m2,
-        "Resultado": f_precio / f_m2
+st.title("🛡️ Wayne Intelligence Suite: Montevideo")
+st.write(f"Sincronizado: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+
+# 2. BASE DE DATOS DE REFERENCIA (Barrios de Montevideo)
+# Estos datos son los que usará el mapa y el comparador
+data_mvd = pd.DataFrame({
+    'lat': [-34.9056, -34.9133, -34.8885, -34.8770, -34.8870, -34.9100],
+    'lon': [-56.1367, -56.1555, -56.1620, -56.1850, -56.2020, -56.1150],
+    'barrio': ['Pocitos', 'Punta Carretas', 'Centro', 'Aguada', 'Prado', 'Buceo'],
+    'precio_m2_ref': [3150, 3400, 2050, 1850, 1750, 2800]
+})
+
+# 3. BARRA LATERAL (CEREBRO DEL NEGOCIO)
+st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/b/be/Batman_Logo.png", width=100)
+st.sidebar.header("📥 Registro de Oportunidad")
+
+with st.sidebar.form("nueva_casa"):
+    b_barrio = st.selectbox("Barrio", data_mvd['barrio'])
+    b_precio = st.number_input("Precio Venta (USD)", min_value=10000, value=115000)
+    b_m2 = st.number_input("Metros Cuadrados", min_value=10, value=45)
+    submit = st.form_submit_button("REGISTRAR EN HISTORIAL")
+
+# 4. CUERPO PRINCIPAL - MAPA Y MÉTRICAS
+col_map, col_info = st.columns([2, 1])
+
+with col_map:
+    st.subheader("📍 Mapa de Calor: Valor m²")
+    st.map(data_mvd)
+
+with col_info:
+    st.subheader("📊 Análisis de Valor")
+    m2_calculado = b_precio / b_m2
+    ref_zona = data_mvd[data_mvd['barrio'] == b_barrio]['precio_m2_ref'].values[0]
+    dif_porcentaje = ((m2_calculado - ref_zona) / ref_zona) * 100
+
+    st.metric("Tu m²", f"USD {m2_calculado:,.0f}")
+    st.metric("Promedio Zona", f"USD {ref_zona:,.0f}", delta=f"{dif_porcentaje:.1f}%", delta_color="inverse")
+
+    if m2_calculado < ref_zona:
+        st.success("💎 ¡Ganga Detectada! Por debajo del mercado.")
+    else:
+        st.warning("⚖️ Precio de mercado o superior.")
+
+# 5. BASE DE DATOS Y DESCARGA
+st.divider()
+st.subheader("📁 Historial de Caza (Base de Datos)")
+
+# Lógica para mantener los datos en la sesión actual
+if 'historial' not in st.session_state:
+    st.session_state.historial = []
+
+if submit:
+    nuevo_registro = {
+        "Fecha": datetime.now().strftime("%H:%M:%S"),
+        "Barrio": b_barrio,
+        "Precio": b_precio,
+        "m2": b_m2,
+        "USD/m2": round(m2_calculado, 2),
+        "Estado": "Oportunidad" if m2_calculado < ref_zona else "Normal"
     }
-    
-    # Aquí es donde ocurre la magia:
-    # Por ahora lo guardamos en el 'estado' de la sesión para probar
-    if 'db' not in st.session_state:
-        st.session_state.db = []
-    
-    st.session_state.db.append(nueva_fila)
-    st.success("✅ ¡Dato guardado localmente! Conectando con Google...")
+    st.session_state.historial.append(nuevo_registro)
 
-# --- MOSTRAR LOS DATOS ACUMULADOS ---
-if 'db' in st.session_state:
-    st.write("### 📁 Tu Base de Datos Histórica")
-    df_visual = pd.DataFrame(st.session_state.db)
-    st.dataframe(df_visual)
+if st.session_state.historial:
+    df_h = pd.DataFrame(st.session_state.historial)
+    st.dataframe(df_h, use_container_width=True)
     
-    # Botón para descargar a Excel real
-    csv = df_visual.to_csv(index=False).encode('utf-8')
-    st.download_button("Descargar Excel (.csv)", csv, "datos_wayne.csv", "text/csv")
+    # Exportación a Excel/CSV
+    csv_data = df_h.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📥 DESCARGAR BASE DE DATOS (CSV)",
+        data=csv_data,
+        file_name=f"reporte_wayne_{datetime.now().strftime('%d_%m')}.csv",
+        mime="text/csv"
+    )
+else:
+    st.info("Aún no has registrado propiedades en esta sesión.")
 
-st.info("💡 Siguiente paso: Configurar 'Secrets' en Streamlit para el guardado automático en Google Sheets.")
+st.caption("Wayne Capital Uruguay - Sistema de Intelig
