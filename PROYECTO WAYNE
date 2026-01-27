@@ -1,0 +1,51 @@
+import tkinter as tk
+import urllib.request
+import json
+from datetime import datetime
+
+def actualizar_automatico():
+    try:
+        # 1. Conexión al flujo de datos
+        url = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+        res = urllib.request.urlopen(url)
+        datos = json.loads(res.read())
+        precio = float(datos['price'])
+        
+        # 2. Lógica de "Oportunidad"
+        hora_actual = datetime.now().strftime("%H:%M:%S")
+        txt_monitor.insert("1.0", f"[{hora_actual}] Escaneo: USD {precio:,.2f}\n")
+        
+        # 3. Alarma visual
+        if precio < 65000: # Cambia este número a tu gusto
+            lbl_aviso.config(text="🔥 ¡PRECIO BAJO! MOMENTO DE COMPRA", fg="gold")
+            ventana.configure(bg="#220000")
+        else:
+            lbl_aviso.config(text="⚖️ Mercado estable", fg="white")
+            ventana.configure(bg="#0a0a0a")
+
+    except:
+        txt_monitor.insert("1.0", "⚠️ Error de red... Reintentando.\n")
+
+    # --- EL TRUCO DE LA AUTOMATIZACIÓN ---
+    # Esto le dice a la ventana: "En 10000 milisegundos (10 seg), vuelve a llamar a esta función"
+    ventana.after(10000, actualizar_automatico)
+
+# --- INTERFAZ ---
+ventana = tk.Tk()
+ventana.title("Wayne Autonomous Monitor")
+ventana.geometry("400x500")
+ventana.configure(bg="#0a0a0a")
+
+tk.Label(ventana, text="MONITOR AUTÓNOMO", bg="#0a0a0a", fg="#555", font=("Arial", 10, "bold")).pack(pady=10)
+
+lbl_aviso = tk.Label(ventana, text="Iniciando sistemas...", bg="#0a0a0a", fg="white", font=("Arial", 12))
+lbl_aviso.pack(pady=10)
+
+# El cuadro donde el robot escribe solo
+txt_monitor = tk.Text(ventana, bg="black", fg="#00FF00", font=("Consolas", 10), padx=10, pady=10)
+txt_monitor.pack(padx=20, pady=10, fill="both", expand=True)
+
+# Lanzamos la primera actualización (y de ahí sigue solo)
+actualizar_automatico()
+
+ventana.mainloop()
