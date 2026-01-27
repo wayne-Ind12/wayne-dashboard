@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import numpy as np  # <--- ESTA ES LA LÍNEA QUE FALTA
 from datetime import datetime
 
 # 1. CONFIGURACIÓN DE MARCA: PASE TECH
@@ -101,3 +101,4 @@ with pestanas[3]:
 
 st.divider()
 st.caption("Pase Tech © 2026 - Montevideo, Uruguay. Soluciones de Software de Próxima Generación.")
+
