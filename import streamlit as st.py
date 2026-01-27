@@ -1,50 +1,46 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+from datetime import datetime
 
-st.set_page_config(page_title="Wayne Real Estate", layout="wide")
+# Título de la App
+st.title("🦇 Wayne Real Estate - Base de Datos")
 
-st.title("🦇 Wayne Real Estate - Radar Montevideo")
+# --- ENTRADA DE DATOS ---
+with st.form("registro_propiedad"):
+    st.write("Registrar nueva oportunidad detectada")
+    f_barrio = st.selectbox("Barrio", ["Pocitos", "Centro", "Carrasco", "Cordón", "Prado"])
+    f_precio = st.number_input("Precio (USD)", value=100000)
+    f_m2 = st.number_input("Metros", value=40)
+    
+    boton_guardar = st.form_submit_button("Guardar en la Nube")
 
-# --- DATOS DEL MAPA ---
-# Coordenadas aproximadas de barrios en Montevideo
-data_barrios = pd.DataFrame({
-    'lat': [-34.9056, -34.9133, -34.8885, -34.8770, -34.8870],
-    'lon': [-56.1367, -56.1555, -56.1620, -56.1850, -56.2020],
-    'barrio': ['Pocitos', 'Punta Carretas', 'Centro', 'Aguada', 'Prado'],
-    'precio_m2': [3200, 3500, 2100, 1900, 1800]
-})
+# --- LÓGICA DE GUARDADO ---
+if boton_guardar:
+    # Creamos la nueva fila
+    nueva_fila = {
+        "Fecha": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "Barrio": f_barrio,
+        "Precio": f_precio,
+        "m2": f_m2,
+        "Resultado": f_precio / f_m2
+    }
+    
+    # Aquí es donde ocurre la magia:
+    # Por ahora lo guardamos en el 'estado' de la sesión para probar
+    if 'db' not in st.session_state:
+        st.session_state.db = []
+    
+    st.session_state.db.append(nueva_fila)
+    st.success("✅ ¡Dato guardado localmente! Conectando con Google...")
 
-st.markdown("### 📍 Mapa de Valor por Metro Cuadrado")
-st.write("Explora las zonas de mayor rentabilidad:")
+# --- MOSTRAR LOS DATOS ACUMULADOS ---
+if 'db' in st.session_state:
+    st.write("### 📁 Tu Base de Datos Histórica")
+    df_visual = pd.DataFrame(st.session_state.db)
+    st.dataframe(df_visual)
+    
+    # Botón para descargar a Excel real
+    csv = df_visual.to_csv(index=False).encode('utf-8')
+    st.download_button("Descargar Excel (.csv)", csv, "datos_wayne.csv", "text/csv")
 
-# Mostramos el mapa
-st.map(data_barrios)
-
-# --- CALCULADORA AVANZADA ---
-st.sidebar.header("Calculadora de Inversión")
-barrio_sel = st.sidebar.selectbox("Selecciona Zona", data_barrios['barrio'])
-precio_total = st.sidebar.number_input("Precio Inmueble (USD)", value=120000)
-m2_total = st.sidebar.number_input("Metros Cuadrados", value=45)
-
-# Lógica de comparación
-p_m2_actual = precio_total / m2_total
-promedio_zona = data_barrios[data_barrios['barrio'] == barrio_sel]['precio_m2'].values[0]
-
-st.markdown(f"## Análisis para {barrio_sel}")
-col1, col2 = st.columns(2)
-
-with col1:
-    st.metric("Precio m² actual", f"USD {p_m2_actual:,.0f}")
-with col2:
-    diferencia = p_m2_actual - promedio_zona
-    st.metric("Vs. Promedio Zona", f"{diferencia:,.0f} USD", delta=-diferencia)
-
-if p_m2_actual < promedio_zona:
-    st.success("✅ ¡Oportunidad detectada! El precio está por debajo del promedio del barrio.")
-else:
-    st.error("⚠️ El precio está por encima del promedio. ¡Negocia con el vendedor!")
-
-# --- TABLA DE DATOS ---
-with st.expander("Ver tabla de referencia de precios"):
-    st.table(data_barrios)
+st.info("💡 Siguiente paso: Configurar 'Secrets' en Streamlit para el guardado automático en Google Sheets.")
