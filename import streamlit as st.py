@@ -3,94 +3,116 @@ import pandas as pd
 import random
 from datetime import datetime
 
-# 1. CONFIGURACIÓN Y ESTILO PASE TECH
-st.set_page_config(page_title="Pase Tech Global", layout="wide", page_icon="🌎")
+# 1. CONFIGURACIÓN Y ESTILO
+st.set_page_config(page_title="Pase Tech Global", layout="wide", page_icon="🌐")
 
 st.markdown("""
     <style>
     .stApp { background-color: #0d1117; color: #c9d1d9; }
-    .stMetric { background-color: #161b22; border: 1px solid #30363d; padding: 15px; border-radius: 10px; }
-    .stTabs [data-baseweb="tab"] { color: #58a6ff; font-weight: bold; }
+    .stMetric { background-color: #161b22; border: 2px solid #58a6ff; padding: 15px; border-radius: 12px; }
+    .stTabs [data-baseweb="tab"] { color: #58a6ff; font-weight: bold; font-size: 18px; }
+    .stSelectbox label, .stSlider label { color: #58a6ff !important; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. BASE DE DATOS GLOBAL (Simulada para Pase Tech)
+# 2. BASE DE DATOS MAESTRA (Países, Ciudades, Costo Vida, Inmuebles)
 DB_GLOBAL = {
-    "Uruguay": {"Montevideo": 2800, "Punta del Este": 3500, "Gastos": 0.09},
-    "Argentina": {"Buenos Aires": 2200, "Córdoba": 1400, "Gastos": 0.07},
-    "EEUU": {"Miami": 6500, "Nueva York": 12000, "Madrid": 4500, "Gastos": 0.05},
-    "España": {"Madrid": 4800, "Barcelona": 4200, "Gastos": 0.10}
+    "Uruguay": {"Montevideo": 2800, "Punta del Este": 3500, "Costo_Vida": 1200, "Visa": "Residencia Mercosur"},
+    "EEUU": {"Miami": 6500, "Nueva York": 12000, "Los Angeles": 8000, "Costo_Vida": 3500, "Visa": "F1/H1-B/EB-5"},
+    "España": {"Madrid": 4800, "Barcelona": 4200, "Valencia": 3000, "Costo_Vida": 1800, "Visa": "Nómada Digital/Arraigo"},
+    "Brasil": {"San Pablo": 2100, "Rio de Janeiro": 1900, "Florianópolis": 1600, "Costo_Vida": 900, "Visa": "Residencia Mercosur"},
+    "Japón": {"Tokio": 9000, "Osaka": 6000, "Kioto": 5500, "Costo_Vida": 2500, "Visa": "Working Holiday/Highly Skilled"},
+    "Italia": {"Roma": 5000, "Milán": 7000, "Nápoles": 2800, "Costo_Vida": 2000, "Visa": "Ciudadanía/Elective Residence"}
 }
 
-# 3. NAVEGACIÓN
+# 3. NAVEGACIÓN PRINCIPAL
 if 'intro_done' not in st.session_state:
     st.session_state.intro_done = False
 
 if not st.session_state.intro_done:
-    st.title("🌎 PASE TECH GLOBAL SOLUTIONS")
-    st.header("Tu Pasaporte a la Inversión y el Futuro")
-    if st.button("ENTRAR AL TERMINAL GLOBAL"):
+    st.title("🌐 PASE TECH GLOBAL SOLUTIONS")
+    st.subheader("Inteligencia Estratégica para un Mundo sin Fronteras")
+    if st.button("INICIAR SESIÓN EN EL SISTEMA"):
         st.session_state.intro_done = True
 else:
-    tabs = st.tabs(["🏗️ INMUEBLES GLOBALES", "💎 VIP: PLANNER", "🔐 CIBER", "🧬 BIO", "🚀 ESPACIO"])
+    tabs = st.tabs(["🏗️ INMUEBLES", "💎 VIP PLANNER", "🔐 CIBERSEGURIDAD", "🧬 BIOTECH", "🚀 ESPACIO"])
 
-    # --- SECCIÓN 1: INMUEBLES INTERNACIONALES ---
+    # --- TAB 1: INMUEBLES INTERNACIONALES ---
     with tabs[0]:
-        st.header("Radar de Inversión Internacional")
-        col_p1, col_p2 = st.columns(2)
-        
-        with col_p1:
-            pais = st.selectbox("Seleccione País", list(DB_GLOBAL.keys()))
-            ciudad = st.selectbox("Seleccione Ciudad", list(DB_GLOBAL[pais].keys())[:-1])
-            m2_deseados = st.number_input("Metros Cuadrados", value=50)
-            
-        with col_p2:
-            precio_m2 = DB_GLOBAL[pais][ciudad]
-            subtotal = precio_m2 * m2_deseados
-            gastos_ley = subtotal * DB_GLOBAL[pais]["Gastos"]
-            total = subtotal + gastos_ley
-            
-            st.metric(f"Inversión en {ciudad}", f"USD {total:,.0f}")
-            st.write(f"Precio promedio m²: USD {precio_m2}")
-            st.write(f"Gastos legales estimados ({pais}): USD {gastos_ley:,.0f}")
+        st.header("Análisis Inmobiliario Internacional")
+        col_i1, col_i2 = st.columns(2)
+        with col_i1:
+            p_sel = st.selectbox("País de Inversión", list(DB_GLOBAL.keys()))
+            c_sel = st.selectbox("Ciudad", list(DB_GLOBAL[p_sel].keys())[:-2])
+            metros = st.number_input("Metros Cuadrados", 20, 1000, 60)
+        with col_i2:
+            base = DB_GLOBAL[p_sel][c_sel] * metros
+            impuestos = base * 0.08 # Promedio global
+            st.metric(f"Inversión Total en {c_sel}", f"USD {base + impuestos:,.0f}")
+            st.info(f"Impuestos estimados en {p_sel}: USD {impuestos:,.0f}")
 
-    # --- SECCIÓN 2: VIP GLOBAL PLANNER (Nueva función solicitada) ---
+    # --- TAB 2: VIP GLOBAL PLANNER (ULTRA PERSONALIZADO) ---
     with tabs[1]:
-        st.header("💎 VIP: Planificador de Relocalización")
-        st.write("Configura tu perfil para analizar viabilidad en el extranjero.")
+        st.header("💎 VIP Global Migration & Career Planner")
+        c1, c2 = st.columns([1, 1])
+        with c1:
+            dest = st.selectbox("Destino de Relocalización", list(DB_GLOBAL.keys()))
+            profesion = st.selectbox("Tu Profesión / Ocupación", ["Estudiante", "Programador/IT", "Médico", "Inversionista", "Chef/Hostelería"])
+            idioma = st.select_slider("Nivel de Idioma Local", options=["Nulo", "Básico", "Intermedio", "Avanzado/Nativo"])
         
-        c_vip1, c_vip2 = st.columns(2)
-        with c_vip1:
-            destino = st.selectbox("Destino de Interés", ["Miami, EEUU", "Madrid, España", "Nueva York, EEUU"])
-            perfil = st.radio("Tu Perfil:", ["Estudiante", "Profesional IT", "Inversor / Negocios"])
-            presupuesto = st.number_input("Presupuesto Mensual Disponible (USD)", value=2000)
-
-        with c_vip2:
-            st.subheader("Análisis de Viabilidad")
-            # Lógica de utilidad real
-            if destino == "Miami, EEUU":
-                costo_vida = 3000 if perfil != "Estudiante" else 1800
-                st.write(f"🏠 **Alojamiento:** Disponibilidad Media (Estudios desde $1,500)")
-                if perfil == "Estudiante":
-                    st.success("🎓 Becas disponibles en UM y FIU. Visa F-1 requerida.")
-                elif perfil == "Profesional IT":
-                    st.info("💼 Alta demanda en 'The Magic City'. Sueldos promedio: $6,000/mes.")
+        with c2:
+            st.subheader("Reporte de Viabilidad")
+            costo = DB_GLOBAL[dest]["Costo_Vida"]
+            visa_tipo = DB_GLOBAL[dest]["Visa"]
             
-            elif destino == "Madrid, España":
-                costo_vida = 1500
-                st.write("🏠 **Alojamiento:** Muy alta demanda (Barrios económicos: Vallecas, Usera)")
-                st.success("🇪🇸 Idioma compatible. Facilidad para visas de nómada digital.")
+            # Lógica personalizada
+            if profesion == "Programador/IT":
+                sueldo_est = costo * 2.5
+                st.success(f"📈 Alta Demanda: Sueldo estimado USD {sueldo_est:,.0f}")
+            elif profesion == "Estudiante":
+                st.info(f"🎓 Costo de vida reducido estimado: USD {costo * 0.8:,.0f}")
+            
+            st.write(f"🛂 **Trámite Sugerido:** {visa_tipo}")
+            st.write(f"🏠 **Dificultad de Alojamiento:** {'Alta' if costo > 2500 else 'Media/Baja'}")
+            
+            if idioma == "Nulo" and dest in ["Japón", "EEUU", "Italia"]:
+                st.warning("⚠️ El idioma será una barrera crítica inicial.")
 
-            # Resumen Financiero
-            if presupuesto >= costo_vida:
-                st.success(f"✅ Presupuesto apto para {destino}. Balance estimado: +{presupuesto - costo_vida} USD")
-            else:
-                st.error(f"⚠️ Presupuesto ajustado. Te faltan USD {costo_vida - presupuesto} para vivir cómodo.")
+    # --- TAB 3: CIBERSEGURIDAD (Nuevas Opciones) ---
+    with tabs[2]:
+        st.header("Blindaje Digital Pase Tech")
+        op_ciber = st.radio("Herramienta:", ["Generador de Llaves", "Auditoría de Red", "Recuperación de Datos"])
+        if op_ciber == "Generador de Llaves":
+            longitud = st.slider("Longitud", 12, 64, 24)
+            st.code("".join(random.choices("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*", k=longitud)))
+        else:
+            st.write("Módulo en ejecución... Protegiendo puertos activos.")
 
-    # --- EL RESTO DE SECCIONES (Siguen igual para mantener utilidad) ---
-    with tabs[2]: st.header("🔐 Ciberseguridad"); st.write("Módulo operativo.")
-    with tabs[3]: st.header("🧬 Biotecnología"); st.write("Laboratorio en línea.")
-    with tabs[4]: st.header("🚀 Aeroespacial"); st.write("Telemetría activa.")
+    # --- TAB 4: BIOTECH (Nuevas Opciones) ---
+    with tabs[3]:
+        st.header("Pase Tech Bio-Analytics")
+        modo_bio = st.selectbox("Módulo:", ["Análisis de Sangre", "Optimización Deportiva", "Estudio del Sueño"])
+        if modo_bio == "Optimización Deportiva":
+            deporte = st.text_input("Deporte", "Fútbol")
+            horas = st.number_input("Horas de entrenamiento/semana", 1, 40, 10)
+            st.metric("Recuperación Necesaria", f"{(horas * 1.5):.1f} horas/semana")
+        else:
+            st.info("Conecte un dispositivo wearable para ver datos en tiempo real.")
+
+    # --- TAB 5: ESPACIO (Nuevas Opciones) ---
+    with tabs[4]:
+        st.header("Pase Tech Aerospace & SAT")
+        servicio_esp = st.selectbox("Servicio Satelital:", ["Internet Global", "Fotos HD del Suelo", "Minería de Asteroides (Beta)"])
+        
+        if servicio_esp == "Fotos HD del Suelo":
+            lat = st.number_input("Latitud", value=-34.90)
+            lon = st.number_input("Longitud", value=-56.16)
+            st.button("Capturar Imagen Satelital")
+            st.image("https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=600", caption="Vista orbital procesada")
+        elif servicio_esp == "Internet Global":
+            st.metric("Latencia Estimada", "22ms")
+            st.progress(85, text="Cobertura en tu zona")
 
 st.divider()
-st.caption("Pase Tech Suite v5.0 - Global Intelligence System")
+st.caption("Pase Tech Suite v6.0 | Global & Aero Intelligence | 2026")
+
