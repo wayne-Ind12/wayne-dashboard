@@ -2,143 +2,125 @@ import streamlit as st
 import pandas as pd
 import random
 import time
+import hashlib
 from datetime import datetime
 
-# 1. CONFIGURACIÓN DE PANTALLA Y ESTILO PROFESIONAL
-st.set_page_config(page_title="Pase Tech Omni-Intelligence", layout="wide", page_icon="⚡")
+# 1. CONFIGURACIÓN CINEMATOGRÁFICA
+st.set_page_config(page_title="PASE TECH - COMMAND CENTER", layout="wide", page_icon="🦇")
 
 st.markdown("""
     <style>
-    .stApp { background-color: #05070a; color: #c9d1d9; }
-    [data-testid="stMetricValue"] { font-size: 1.8rem; color: #58a6ff; font-family: 'Courier New'; }
-    .stTabs [data-baseweb="tab"] { padding: 10px; font-weight: bold; }
-    .stChatMessage { border-radius: 15px; margin-bottom: 10px; border: 1px solid #1f2937; background-color: #0d1117; }
+    .stApp { background-color: #05070a; color: #e0e0e0; }
+    [data-testid="stMetricValue"] { color: #00d4ff; font-family: 'Share Tech Mono', monospace; }
+    .stTabs [data-baseweb="tab"] { color: #888; font-weight: bold; border-bottom: 2px solid #1a1a1a; }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] { color: #00d4ff; border-bottom: 2px solid #00d4ff; }
+    .stChatMessage { border-radius: 5px; border-left: 5px solid #00d4ff; background-color: #0d1117; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. BASE DE DATOS MAESTRA (EL "SABER" DE LA IA)
+# 2. BASE DE DATOS ESTRATÉGICA (CALIDAD PREMUM)
 DB_GLOBAL = {
-    "Uruguay": {"Ciudad": "Montevideo", "m2": 2800, "Costo_Vida": 1200, "Visa": "Residencia Mercosur", "Impuesto": 9},
-    "EEUU": {"Ciudad": "Miami", "m2": 8000, "Costo_Vida": 3500, "Visa": "Visa H1-B / O-1", "Impuesto": 5},
-    "España": {"Ciudad": "Madrid", "m2": 4800, "Costo_Vida": 1800, "Visa": "Nómada Digital", "Impuesto": 10},
-    "Reino Unido": {"Ciudad": "Londres", "m2": 11000, "Costo_Vida": 3200, "Visa": "Skilled Worker", "Impuesto": 12},
-    "EAU": {"Ciudad": "Dubái", "m2": 7500, "Costo_Vida": 2800, "Visa": "Golden Visa", "Impuesto": 0},
-    "Australia": {"Ciudad": "Sídney", "m2": 8500, "Costo_Vida": 3000, "Visa": "Skilled Nominated", "Impuesto": 6},
-    "Corea del Sur": {"Ciudad": "Seúl", "m2": 9000, "Costo_Vida": 2100, "Visa": "Visa E-7", "Impuesto": 7},
-    "Suiza": {"Ciudad": "Zúrich", "m2": 15000, "Costo_Vida": 4500, "Visa": "Permiso B/L", "Impuesto": 5}
+    "Uruguay": {"m2": 2800, "Costo": 1200, "Impuesto": 9, "Status": "Estable"},
+    "Suiza": {"m2": 15500, "Costo": 4800, "Impuesto": 5, "Status": "Máxima Seguridad"},
+    "EAU (Dubái)": {"m2": 7800, "Costo": 2900, "Impuesto": 0, "Status": "Paraíso Fiscal"},
+    "EEUU (Miami)": {"m2": 8200, "Costo": 3600, "Impuesto": 5, "Status": "Hub Tecnológico"},
+    "Japón (Tokio)": {"m2": 9800, "Costo": 2600, "Impuesto": 8, "Status": "Alta Tecnología"}
 }
 
-# 3. MOTOR DE IA AVANZADO (LÓGICA DE RAZONAMIENTO)
-def procesar_ia_pro(query):
+# 3. NÚCLEO DE INTELIGENCIA (EL CEREBRO)
+def motor_ia_bruno(query):
     q = query.lower()
-    
-    # Razonamiento sobre Inversión (Compara toda la DB)
-    if any(p in q for p in ["mejor", "invertir", "donde", "inversión", "comprar"]):
-        pais_barato = min(DB_GLOBAL, key=lambda x: DB_GLOBAL[x]['m2'])
-        pais_sin_imp = "EAU (Dubái)"
-        return (f"🧠 **Análisis de Mercado Pase AI:**\n\n"
-                f"Si buscas el m² más accesible, **{pais_barato}** es el líder actual. "
-                f"Sin embargo, para maximizar rentabilidad neta, **{pais_sin_imp}** es imbatible por su 0% de impuestos.\n\n"
-                f"¿Quieres que comparemos el retorno de inversión (ROI) entre dos destinos específicos?")
-
-    # Razonamiento sobre Vida/Trabajo/Estudio
-    elif any(p in q for p in ["vivir", "viajar", "trabajar", "estudiar", "emigrar"]):
-        mejor_vida = "España" if "estudiar" in q or "vivir" in q else "EEUU"
-        return (f"🌍 **Consultoría de Relocalización:**\n\n"
-                f"Para un perfil técnico, **{mejor_vida}** ofrece los mejores ecosistemas. "
-                f"Si eres estudiante, recomiendo **España** por la facilidad de visa. "
-                f"En la pestaña 'GLOBAL PLANNER' he cargado los costos de vida exactos para que compares.")
-
-    # Razonamiento sobre Seguridad/Hack/Traje
-    elif any(p in q for p in ["seguridad", "hacker", "proteger", "traje", "gadget"]):
-        return (f"🛡️ **Protocolo Táctico Pase Tech:**\n\n"
-                "He verificado los sistemas. Recomiendo implementar 'Cifrado Cuántico' y auditar los nodos de red. "
-                "Si estás diseñando tu traje táctico, el módulo de 'Control Táctico' tiene el botón de alerta activo.")
-
-    # Saludos y Personalidad Humana
-    elif any(p in q for p in ["hola", "quien sos", "ayuda", "buen"]):
-        return ("¡Hola! Soy el núcleo de inteligencia **Pase AI**. ⚡\n\n"
-                "A diferencia de una IA común, yo tengo acceso directo a la base de datos financiera de Pase Tech. "
-                "Puedo decirte dónde invertir, cuánto cuesta vivir en el extranjero o proteger tus sistemas. ¿Qué misión tenemos hoy?")
-
+    if any(p in q for p in ["mejor", "invertir", "dinero", "ganar"]):
+        return "🧠 **Análisis:** Para preservar anonimato y capital, **Suiza** es la base ideal. Si buscas expansión rápida sin drenaje de impuestos, **Dubái** es la zona de operación recomendada."
+    elif any(p in q for p in ["seguridad", "protección", "hack", "contraseña"]):
+        return "🛡️ **Seguridad:** Protocolo de encriptación activado. Usa la pestaña 'THE VAULT' para generar llaves de acceso nivel 7. No uses la misma clave en dos servidores."
+    elif any(p in q for p in ["hola", "estás", "quien"]):
+        return "🦇 **Sistemas Activos:** Soy el asistente táctico de Pase Tech. Estoy monitoreando tus activos globales y el estado del traje. ¿Cuál es el siguiente paso?"
     else:
-        return ("🤔 **Pase AI - Procesamiento:**\n\n"
-                f"He analizado tu consulta sobre '{query}'. Mis sensores globales sugieren que esto impacta en tu rentabilidad. "
-                "¿Podrías darme más detalles o elegir una de mis especialidades (Inmuebles, Seguridad o Viajes)?")
+        return f"Procesando... Mi base de datos sugiere que '{query}' tiene relevancia estratégica. ¿Deseas un análisis de riesgo detallado?"
 
-# 4. INTERFAZ Y NAVEGACIÓN
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
+# 4. SISTEMA DE SEGURIDAD (THE VAULT)
+def generar_password(length=24):
+    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+"
+    return "".join(random.choice(chars) for _ in range(length))
 
-st.title("⚡ PASE TECH GLOBAL SOLUTIONS")
+# --- INTERFAZ DE COMANDO ---
+if 'acceso_concedido' not in st.session_state: st.session_state.acceso_concedido = False
 
-tabs = st.tabs(["🧠 PASE AI", "🌍 GLOBAL PLANNER", "🏢 INMUEBLES", "🛡️ TACTICAL", "🧬 BIOTECH", "🛰️ ESPACIO"])
+if not st.session_state.acceso_concedido:
+    st.title("🔐 ACCESO RESTRINGIDO - PASE TECH")
+    password = st.text_input("Ingresa Código de Acceso Táctico", type="password")
+    if st.button("AUTENTICAR"):
+        if password == "bruno": # CAMBIA TU CLAVE AQUÍ
+            st.session_state.acceso_concedido = True
+            st.success("Identidad verificada. Bienvenido, Señor.")
+            st.rerun()
+        else:
+            st.error("Acceso denegado. Intento de intrusión registrado.")
+else:
+    # EL DASHBOARD UNIFICADO
+    st.title("🦇 PASE TECH: COMMAND CENTER")
+    tabs = st.tabs(["🧠 PASE AI", "🔑 THE VAULT", "🌍 GLOBAL PLANNER", "🏢 INMUEBLES PRO", "🦾 TACTICAL & BIO"])
 
-# --- TAB 1: PASE AI ---
-with tabs[0]:
-    st.subheader("Centro de Inteligencia Pro")
-    for m in st.session_state.messages:
-        with st.chat_message(m["role"]): st.markdown(m["content"])
+    # 1. PASE AI
+    with tabs[0]:
+        st.subheader("Interfase de Inteligencia")
+        if 'msgs' not in st.session_state: st.session_state.msgs = []
+        for m in st.session_state.msgs:
+            with st.chat_message(m["role"]): st.write(m["content"])
+        if p := st.chat_input("Escribe una orden..."):
+            st.session_state.msgs.append({"role": "user", "content": p})
+            with st.chat_message("user"): st.write(p)
+            res = motor_ia_bruno(p)
+            st.session_state.msgs.append({"role": "assistant", "content": res})
+            with st.chat_message("assistant"): st.write(res)
 
-    if p := st.chat_input("Escribe tu consulta al sistema..."):
-        st.session_state.messages.append({"role": "user", "content": p})
-        with st.chat_message("user"): st.markdown(p)
-        
-        with st.spinner("IA Pensando..."):
-            time.sleep(1) # Simula procesamiento
-            r = procesar_ia_pro(p)
-            st.session_state.messages.append({"role": "assistant", "content": r})
-            with st.chat_message("assistant"): st.markdown(r)
+    # 2. THE VAULT (EXCLUSIVO)
+    with tabs[1]:
+        st.subheader("🔒 Bóveda de Encriptación")
+        col_v1, col_v2 = st.columns(2)
+        with col_v1:
+            st.write("Genera contraseñas imposibles de romper por fuerza bruta.")
+            long = st.slider("Longitud de Bits", 12, 64, 32)
+            if st.button("GENERAR LLAVE MAESTRA"):
+                nueva_clave = generar_password(long)
+                st.code(nueva_clave, language='text')
+                st.warning("⚠️ Guarda esta clave en un lugar físico. No la subas a la nube.")
+        with col_v2:
+            st.write("Verificador de Integridad (Hash)")
+            texto = st.text_input("Texto para encriptar")
+            if texto:
+                st.write("Hash SHA-256:")
+                st.code(hashlib.sha256(texto.encode()).hexdigest())
 
-# --- TAB 2: GLOBAL PLANNER ---
-with tabs[1]:
-    st.subheader("💎 Planificador de Relocalización")
-    c1, c2 = st.columns(2)
-    with c1:
-        pais_dest = st.selectbox("País Destino", list(DB_GLOBAL.keys()))
-        profesion = st.selectbox("Ocupación", ["Estudiante", "Programador IT", "Inversor Senior", "Médico"])
-    with c2:
-        info = DB_GLOBAL[pais_dest]
-        st.metric(f"Costo Mensual en {info['Ciudad']}", f"USD {info['Costo_Vida']:,}")
-        st.info(f"Requisito de Visa: {info['Visa']}")
+    # 3. GLOBAL PLANNER
+    with tabs[2]:
+        st.subheader("🌍 Inteligencia de Relocalización")
+        dest = st.selectbox("Destino Operativo", list(DB_GLOBAL.keys()))
+        info = DB_GLOBAL[dest]
+        st.metric(f"Costo de Vida - {dest}", f"USD {info['Costo']}")
+        st.write(f"**Estatus:** {info['Status']} | **Visa:** {info['m2']}")
 
-# --- TAB 3: INMUEBLES ---
-with tabs[2]:
-    st.subheader("Inversión Inmobiliaria Global")
-    col_i = st.columns(2)
-    with col_i[0]:
-        p_sel = st.selectbox("País de Inversión", list(DB_GLOBAL.keys()), key="inv_p")
-        m2_input = st.slider("Metros Cuadrados", 30, 500, 80)
-    with col_i[1]:
-        precio_m2 = DB_GLOBAL[p_sel]["m2"]
-        subtotal = precio_m2 * m2_input
-        impuesto_final = subtotal * (DB_GLOBAL[p_sel]["Impuesto"] / 100)
-        st.metric(f"Inversión Total en {p_sel}", f"USD {subtotal + impuesto_final:,.0f}")
-        st.write(f"Precio Base: USD {subtotal:,.0f} | Impuestos ({DB_GLOBAL[p_sel]['Impuesto']}%): USD {impuesto_final:,.0f}")
+    # 4. INMUEBLES PRO
+    with tabs[3]:
+        st.subheader("🏢 Adquisición de Sedes")
+        p_sel = st.selectbox("Mercado", list(DB_GLOBAL.keys()), key="inmo")
+        m2 = st.number_input("Superficie necesaria (m²)", 50, 5000, 200)
+        costo_base = DB_GLOBAL[p_sel]["m2"] * m2
+        impuestos = costo_base * (DB_GLOBAL[p_sel]["Impuesto"]/100)
+        st.metric("Inversión de Capital", f"USD {costo_base + impuestos:,.0f}")
 
-# --- TAB 4: TACTICAL ---
-with tabs[3]:
-    st.subheader("Centro de Mando Táctico")
-    if st.button("🔔 ACTIVAR PROTOCOLO DE ALERTA"):
-        st.toast("ALERTA ENVIADA AL DISPOSITIVO VINCULADO", icon="🛡️")
-    st.progress(98, text="Integridad del Blindaje")
-
-# --- TAB 5: BIOTECH ---
-with tabs[4]:
-    st.subheader("🧬 Análisis Bio-Médico")
-    bpm = st.slider("Ritmo Cardíaco (Sensores del Traje)", 50, 180, 75)
-    if bpm > 130: st.error("⚠️ Estrés elevado detectado.")
-    else: st.success("✅ Signos vitales estables.")
-    st.line_chart([random.randint(70, 90) for _ in range(20)])
-
-# --- TAB 6: ESPACIO ---
-with tabs[5]:
-    st.subheader("🛰️ Monitoreo Satelital")
-    st.write("Ubicación actual del satélite Pase-SAT: **Órbita sobre Montevideo**")
-    st.image("https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=600")
-    if st.button("📡 DESCARGAR DATOS TELEMÉTRICOS"):
-        st.download_button("Descargar Reporte", "Datos de órbita: Estables. Energía: 94%.", "reporte.txt")
+    # 5. TACTICAL & BIO
+    with tabs[4]:
+        st.subheader("🦾 Estado del Traje y Satélites")
+        c_t1, c_t2 = st.columns(2)
+        with c_t1:
+            st.metric("Integridad del Traje", "94%", "+2%")
+            bpm = st.slider("Bio-Ritmo", 40, 180, 72)
+            if bpm > 130: st.error("ALERTA: Frecuencia cardíaca alta.")
+        with c_t2:
+            st.write("Posición Satelital: PASE-SAT 1")
+            st.image("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600")
 
 st.divider()
-st.caption(f"Pase Tech Global v11.0 | {datetime.now().strftime('%d/%m/%Y')} | Sistema Inteligente de Operaciones")
-
+st.caption(f"PASE TECH OS v12.0 | Proyectado para Industrias Pase | {datetime.now().year}")
