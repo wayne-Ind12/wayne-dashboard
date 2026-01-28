@@ -5,122 +5,158 @@ import time
 import hashlib
 from datetime import datetime
 
-# 1. CONFIGURACIÓN CINEMATOGRÁFICA
-st.set_page_config(page_title="PASE TECH - COMMAND CENTER", layout="wide", page_icon="🦇")
+# 1. ARQUITECTURA VISUAL (ESTILO CORPORATIVO/TECH)
+st.set_page_config(page_title="PASE TECH | GLOBAL OPS", layout="wide", page_icon="⚡")
 
 st.markdown("""
     <style>
-    .stApp { background-color: #05070a; color: #e0e0e0; }
-    [data-testid="stMetricValue"] { color: #00d4ff; font-family: 'Share Tech Mono', monospace; }
-    .stTabs [data-baseweb="tab"] { color: #888; font-weight: bold; border-bottom: 2px solid #1a1a1a; }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] { color: #00d4ff; border-bottom: 2px solid #00d4ff; }
-    .stChatMessage { border-radius: 5px; border-left: 5px solid #00d4ff; background-color: #0d1117; }
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500&display=swap');
+    .stApp { background-color: #05080a; color: #d1d5db; font-family: 'JetBrains Mono', monospace; }
+    .stMetric { border-left: 3px solid #58a6ff; background-color: #0d1117; padding: 20px; border-radius: 4px; }
+    .stButton>button { width: 100%; border-radius: 2px; background-color: #1f2937; color: #58a6ff; border: 1px solid #30363d; transition: 0.3s; }
+    .stButton>button:hover { background-color: #58a6ff; color: #000; border: 1px solid #58a6ff; }
+    .stTabs [data-baseweb="tab"] { color: #8b949e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] { color: #58a6ff; }
+    .stChatMessage { border-bottom: 1px solid #30363d; background: transparent; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. BASE DE DATOS ESTRATÉGICA (CALIDAD PREMUM)
+# 2. DATA CORE (INTELIGENCIA DE MERCADO)
 DB_GLOBAL = {
-    "Uruguay": {"m2": 2800, "Costo": 1200, "Impuesto": 9, "Status": "Estable"},
-    "Suiza": {"m2": 15500, "Costo": 4800, "Impuesto": 5, "Status": "Máxima Seguridad"},
-    "EAU (Dubái)": {"m2": 7800, "Costo": 2900, "Impuesto": 0, "Status": "Paraíso Fiscal"},
-    "EEUU (Miami)": {"m2": 8200, "Costo": 3600, "Impuesto": 5, "Status": "Hub Tecnológico"},
-    "Japón (Tokio)": {"m2": 9800, "Costo": 2600, "Impuesto": 8, "Status": "Alta Tecnología"}
+    "Uruguay": {"m2": 2850, "Costo": 1250, "Tax": 9, "Risk": "Low", "Visa": "Mercosur"},
+    "Suiza": {"m2": 15800, "Costo": 4900, "Tax": 5, "Risk": "Minimal", "Visa": "Permiso B"},
+    "EAU": {"m2": 7900, "Costo": 3100, "Tax": 0, "Risk": "Medium", "Visa": "Golden"},
+    "USA": {"m2": 8500, "Costo": 3800, "Tax": 5, "Risk": "Low", "Visa": "H1-B / EB-5"},
+    "Singapur": {"m2": 18000, "Costo": 4200, "Tax": 2, "Risk": "Minimal", "Visa": "Employment Pass"}
 }
 
-# 3. NÚCLEO DE INTELIGENCIA (EL CEREBRO)
-def motor_ia_bruno(query):
+STOCKS = {
+    "PASE TECH (PT)": 450.25, "GOLD (XAU)": 2420.10, "BITCOIN (BTC)": 65400.00, "APPLE (AAPL)": 192.45
+}
+
+# 3. FUNCIONES DE ELITE (IA Y SEGURIDAD)
+def ia_logic(query):
     q = query.lower()
-    if any(p in q for p in ["mejor", "invertir", "dinero", "ganar"]):
-        return "🧠 **Análisis:** Para preservar anonimato y capital, **Suiza** es la base ideal. Si buscas expansión rápida sin drenaje de impuestos, **Dubái** es la zona de operación recomendada."
-    elif any(p in q for p in ["seguridad", "protección", "hack", "contraseña"]):
-        return "🛡️ **Seguridad:** Protocolo de encriptación activado. Usa la pestaña 'THE VAULT' para generar llaves de acceso nivel 7. No uses la misma clave en dos servidores."
-    elif any(p in q for p in ["hola", "estás", "quien"]):
-        return "🦇 **Sistemas Activos:** Soy el asistente táctico de Pase Tech. Estoy monitoreando tus activos globales y el estado del traje. ¿Cuál es el siguiente paso?"
-    else:
-        return f"Procesando... Mi base de datos sugiere que '{query}' tiene relevancia estratégica. ¿Deseas un análisis de riesgo detallado?"
+    if "mejor" in q and ("inversión" in q or "lugar" in q):
+        best = min(DB_GLOBAL, key=lambda x: DB_GLOBAL[x]['Tax'])
+        return f"📍 **Análisis Pase AI:** El destino óptimo para eficiencia fiscal es **{best}** (0% Impuestos). Para refugio de capital, **Suiza** mantiene el grado de inversión AAA."
+    elif "mercado" in q or "precio" in q:
+        return f"📈 **Análisis Pase AI:** El Oro está en máximos históricos. Bitcoin muestra consolidación. Se recomienda diversificar un 20% en activos PT."
+    elif "seguridad" in q:
+        return "🛡️ **Protocolo:** Implementando rotación de llaves asimétricas. La red está bajo monitoreo constante."
+    return "💡 **Sugerencia:** Prueba preguntarme sobre 'mejor inversión' o solicita un 'reporte financiero'."
 
-# 4. SISTEMA DE SEGURIDAD (THE VAULT)
-def generar_password(length=24):
-    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+"
-    return "".join(random.choice(chars) for _ in range(length))
+def get_tactical_report():
+    report = f"PASE TECH - TACTICAL REPORT\n{'='*30}\n"
+    report += f"FECHA: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
+    report += f"ESTADO DE ACTIVOS:\n"
+    for k, v in STOCKS.items():
+        report += f"- {k}: ${v:,.2f}\n"
+    report += f"\nRECOMENDACIÓN: Acumular Activos en Zonas Low-Tax.\n{'='*30}"
+    return report
 
-# --- INTERFAZ DE COMANDO ---
-if 'acceso_concedido' not in st.session_state: st.session_state.acceso_concedido = False
+# 4. SISTEMA DE AUTENTICACIÓN
+if 'auth' not in st.session_state: st.session_state.auth = False
 
-if not st.session_state.acceso_concedido:
-    st.title("🔐 ACCESO RESTRINGIDO - PASE TECH")
-    password = st.text_input("Ingresa Código de Acceso Táctico", type="password")
-    if st.button("AUTENTICAR"):
-        if password == "bruno": # CAMBIA TU CLAVE AQUÍ
-            st.session_state.acceso_concedido = True
-            st.success("Identidad verificada. Bienvenido, Señor.")
-            st.rerun()
-        else:
-            st.error("Acceso denegado. Intento de intrusión registrado.")
+if not st.session_state.auth:
+    st.title("⚡ PASE TECH | SECURE LOGIN")
+    with st.container():
+        col_l1, col_l2, col_l3 = st.columns([1,2,1])
+        with col_l2:
+            key = st.text_input("ENTER ACCESS KEY", type="password")
+            if st.button("VERIFY IDENTITY"):
+                if key == "vale": # CLAVE DE COMANDO
+                    st.session_state.auth = True
+                    st.rerun()
+                else: st.error("INVALID KEY.")
 else:
-    # EL DASHBOARD UNIFICADO
-    st.title("🦇 PASE TECH: COMMAND CENTER")
-    tabs = st.tabs(["🧠 PASE AI", "🔑 THE VAULT", "🌍 GLOBAL PLANNER", "🏢 INMUEBLES PRO", "🦾 TACTICAL & BIO"])
+    # --- DASHBOARD PRINCIPAL ---
+    st.sidebar.title("PASE TECH OPS")
+    st.sidebar.write(f"USER: **BRUNO**")
+    st.sidebar.write(f"SYSTEM: **ACTIVE**")
+    if st.sidebar.button("LOGOUT"):
+        st.session_state.auth = False
+        st.rerun()
 
-    # 1. PASE AI
+    tabs = st.tabs(["🧠 CORE AI", "💹 MARKET HUB", "🔒 VAULT", "🏢 REAL ESTATE", "🛰️ TACTICAL"])
+
+    # --- TAB 1: CORE AI ---
     with tabs[0]:
-        st.subheader("Interfase de Inteligencia")
-        if 'msgs' not in st.session_state: st.session_state.msgs = []
-        for m in st.session_state.msgs:
+        st.subheader("Neural Network Interface")
+        if 'chat' not in st.session_state: st.session_state.chat = []
+        for m in st.session_state.chat:
             with st.chat_message(m["role"]): st.write(m["content"])
-        if p := st.chat_input("Escribe una orden..."):
-            st.session_state.msgs.append({"role": "user", "content": p})
+        
+        if p := st.chat_input("Enter strategic command..."):
+            st.session_state.chat.append({"role": "user", "content": p})
             with st.chat_message("user"): st.write(p)
-            res = motor_ia_bruno(p)
-            st.session_state.msgs.append({"role": "assistant", "content": res})
-            with st.chat_message("assistant"): st.write(res)
+            ans = ia_logic(p)
+            st.session_state.chat.append({"role": "assistant", "content": ans})
+            with st.chat_message("assistant"): st.write(ans)
 
-    # 2. THE VAULT (EXCLUSIVO)
+    # --- TAB 2: MARKET HUB (EXCLUSIVO) ---
     with tabs[1]:
-        st.subheader("🔒 Bóveda de Encriptación")
-        col_v1, col_v2 = st.columns(2)
-        with col_v1:
-            st.write("Genera contraseñas imposibles de romper por fuerza bruta.")
-            long = st.slider("Longitud de Bits", 12, 64, 32)
-            if st.button("GENERAR LLAVE MAESTRA"):
-                nueva_clave = generar_password(long)
-                st.code(nueva_clave, language='text')
-                st.warning("⚠️ Guarda esta clave en un lugar físico. No la subas a la nube.")
-        with col_v2:
-            st.write("Verificador de Integridad (Hash)")
-            texto = st.text_input("Texto para encriptar")
-            if texto:
-                st.write("Hash SHA-256:")
-                st.code(hashlib.sha256(texto.encode()).hexdigest())
+        st.subheader("Live Asset Monitoring")
+        m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+        for i, (asset, price) in enumerate(STOCKS.items()):
+            change = random.uniform(-2, 2)
+            cols = [m_col1, m_col2, m_col3, m_col4]
+            cols[i].metric(asset, f"${price:,.2f}", f"{change:.2f}%")
+        
+        st.write("### Market Performance (Last 24h)")
+        st.area_chart([random.randint(100, 200) for _ in range(20)])
 
-    # 3. GLOBAL PLANNER
+    # --- TAB 3: THE VAULT ---
     with tabs[2]:
-        st.subheader("🌍 Inteligencia de Relocalización")
-        dest = st.selectbox("Destino Operativo", list(DB_GLOBAL.keys()))
-        info = DB_GLOBAL[dest]
-        st.metric(f"Costo de Vida - {dest}", f"USD {info['Costo']}")
-        st.write(f"**Estatus:** {info['Status']} | **Visa:** {info['m2']}")
+        st.subheader("Cybersecurity & Encryption")
+        v_col1, v_col2 = st.columns(2)
+        with v_col1:
+            st.write("Generador de Llaves de Acceso")
+            if st.button("GENERATE RSA KEY"):
+                key_gen = "".join(random.choices("ABCDEF0123456789", k=32))
+                st.code(key_gen, language='text')
+                st.toast("New key generated.")
+        with v_col2:
+            st.write("Digital Identity Hash")
+            raw_data = st.text_input("Input Data to Hash")
+            if raw_data:
+                st.code(hashlib.sha256(raw_data.encode()).hexdigest())
 
-    # 4. INMUEBLES PRO
+    # --- TAB 4: REAL ESTATE PRO ---
     with tabs[3]:
-        st.subheader("🏢 Adquisición de Sedes")
-        p_sel = st.selectbox("Mercado", list(DB_GLOBAL.keys()), key="inmo")
-        m2 = st.number_input("Superficie necesaria (m²)", 50, 5000, 200)
-        costo_base = DB_GLOBAL[p_sel]["m2"] * m2
-        impuestos = costo_base * (DB_GLOBAL[p_sel]["Impuesto"]/100)
-        st.metric("Inversión de Capital", f"USD {costo_base + impuestos:,.0f}")
+        st.subheader("Global Portfolio Management")
+        p_sel = st.selectbox("Market Selection", list(DB_GLOBAL.keys()))
+        m2 = st.number_input("Target Area (m²)", 50, 10000, 150)
+        
+        # Cálculo de ROI Simplificado
+        data = DB_GLOBAL[p_sel]
+        costo_total = (data['m2'] * m2) * (1 + data['Tax']/100)
+        
+        st.metric("Total Investment Value", f"USD {costo_total:,.0f}")
+        
+        st.write(f"**Risk Level:** {data['Risk']} | **Visa Path:** {data['Visa']}")
+        
+        # ROI Formula: $ROI = \frac{Ingresos - Costos}{Costos} \times 100$
+        st.write("Fórmula de Rentabilidad Aplicada:")
+        st.latex(r"ROI = \frac{Net\_Revenue}{Total\_Investment} \times 100")
 
-    # 5. TACTICAL & BIO
+    # --- TAB 5: TACTICAL & REPORTS ---
     with tabs[4]:
-        st.subheader("🦾 Estado del Traje y Satélites")
-        c_t1, c_t2 = st.columns(2)
-        with c_t1:
-            st.metric("Integridad del Traje", "94%", "+2%")
-            bpm = st.slider("Bio-Ritmo", 40, 180, 72)
-            if bpm > 130: st.error("ALERTA: Frecuencia cardíaca alta.")
-        with c_t2:
-            st.write("Posición Satelital: PASE-SAT 1")
-            st.image("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600")
+        st.subheader("Operational Intelligence")
+        st.write("Generación de Reportes de Inteligencia para Socios.")
+        
+        report_content = get_tactical_report()
+        st.download_button(
+            label="📄 EXPORT TACTICAL REPORT (TXT)",
+            data=report_content,
+            file_name=f"PASE_TECH_REPORT_{datetime.now().strftime('%Y%H%M')}.txt",
+            mime="text/plain"
+        )
+        
+        st.write("---")
+        st.write("Satellite Link Status")
+        st.progress(92, text="Signal Strength (Encrypted)")
+        st.image("https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=800")
 
 st.divider()
-st.caption(f"PASE TECH OS v12.0 | Proyectado para Industrias Pase | {datetime.now().year}")
+st.caption(f"PASE TECH GLOBAL SOLUTIONS | V13.0 | 2026 | BUILT FOR THE FUTURE.")
