@@ -5,158 +5,138 @@ import time
 import hashlib
 from datetime import datetime
 
-# 1. ARQUITECTURA VISUAL (ESTILO CORPORATIVO/TECH)
-st.set_page_config(page_title="PASE TECH | GLOBAL OPS", layout="wide", page_icon="⚡")
+# 1. ARQUITECTURA VISUAL ELITE
+st.set_page_config(page_title="PASE TECH | EMPIRE OS", layout="wide", page_icon="💎")
 
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500&display=swap');
-    .stApp { background-color: #05080a; color: #d1d5db; font-family: 'JetBrains Mono', monospace; }
-    .stMetric { border-left: 3px solid #58a6ff; background-color: #0d1117; padding: 20px; border-radius: 4px; }
-    .stButton>button { width: 100%; border-radius: 2px; background-color: #1f2937; color: #58a6ff; border: 1px solid #30363d; transition: 0.3s; }
-    .stButton>button:hover { background-color: #58a6ff; color: #000; border: 1px solid #58a6ff; }
-    .stTabs [data-baseweb="tab"] { color: #8b949e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] { color: #58a6ff; }
-    .stChatMessage { border-bottom: 1px solid #30363d; background: transparent; }
+    .stApp { background-color: #010203; color: #a0aec0; }
+    .stMetric { background: linear-gradient(135deg, #0d1117 0%, #05080a 100%); border: 1px solid #1e293b; padding: 20px; border-radius: 10px; }
+    [data-testid="stMetricValue"] { color: #60a5fa; font-family: 'JetBrains Mono', monospace; }
+    .stTabs [data-baseweb="tab"] { font-weight: 700; color: #64748b; }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] { color: #60a5fa; border-bottom-color: #60a5fa; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. DATA CORE (INTELIGENCIA DE MERCADO)
+# 2. DATA MASTER (Sincronizada)
 DB_GLOBAL = {
-    "Uruguay": {"m2": 2850, "Costo": 1250, "Tax": 9, "Risk": "Low", "Visa": "Mercosur"},
-    "Suiza": {"m2": 15800, "Costo": 4900, "Tax": 5, "Risk": "Minimal", "Visa": "Permiso B"},
-    "EAU": {"m2": 7900, "Costo": 3100, "Tax": 0, "Risk": "Medium", "Visa": "Golden"},
-    "USA": {"m2": 8500, "Costo": 3800, "Tax": 5, "Risk": "Low", "Visa": "H1-B / EB-5"},
-    "Singapur": {"m2": 18000, "Costo": 4200, "Tax": 2, "Risk": "Minimal", "Visa": "Employment Pass"}
+    "Suiza": {"m2": 15800, "Tax": 5, "Costo": 4900},
+    "EAU": {"m2": 7900, "Tax": 0, "Costo": 3100},
+    "Uruguay": {"m2": 2850, "Tax": 9, "Costo": 1250},
+    "Singapur": {"m2": 18500, "Tax": 2, "Costo": 4200}
 }
 
-STOCKS = {
-    "PASE TECH (PT)": 450.25, "GOLD (XAU)": 2420.10, "BITCOIN (BTC)": 65400.00, "APPLE (AAPL)": 192.45
+MARKET_DATA = {
+    "BTC": 66200.0, "GOLD": 2350.0, "MSFT": 420.0, "SONY": 94.0
 }
 
-# 3. FUNCIONES DE ELITE (IA Y SEGURIDAD)
-def ia_logic(query):
-    q = query.lower()
-    if "mejor" in q and ("inversión" in q or "lugar" in q):
-        best = min(DB_GLOBAL, key=lambda x: DB_GLOBAL[x]['Tax'])
-        return f"📍 **Análisis Pase AI:** El destino óptimo para eficiencia fiscal es **{best}** (0% Impuestos). Para refugio de capital, **Suiza** mantiene el grado de inversión AAA."
-    elif "mercado" in q or "precio" in q:
-        return f"📈 **Análisis Pase AI:** El Oro está en máximos históricos. Bitcoin muestra consolidación. Se recomienda diversificar un 20% en activos PT."
-    elif "seguridad" in q:
-        return "🛡️ **Protocolo:** Implementando rotación de llaves asimétricas. La red está bajo monitoreo constante."
-    return "💡 **Sugerencia:** Prueba preguntarme sobre 'mejor inversión' o solicita un 'reporte financiero'."
+# 3. NÚCLEO FINANCIERO (Fórmulas)
+def calcular_patrimonio(activos, propiedades_m2, pais_inmueble):
+    # Valor mercado activos
+    val_mercado = sum(activos.values())
+    # Valor propiedades: (m2 * precio_zona)
+    val_inmuebles = propiedades_m2 * DB_GLOBAL[pais_inmueble]["m2"]
+    return val_mercado + val_inmuebles
 
-def get_tactical_report():
-    report = f"PASE TECH - TACTICAL REPORT\n{'='*30}\n"
-    report += f"FECHA: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
-    report += f"ESTADO DE ACTIVOS:\n"
-    for k, v in STOCKS.items():
-        report += f"- {k}: ${v:,.2f}\n"
-    report += f"\nRECOMENDACIÓN: Acumular Activos en Zonas Low-Tax.\n{'='*30}"
-    return report
+# 4. SISTEMA DE CONTROL
+if 'auth_empire' not in st.session_state: st.session_state.auth_empire = False
 
-# 4. SISTEMA DE AUTENTICACIÓN
-if 'auth' not in st.session_state: st.session_state.auth = False
-
-if not st.session_state.auth:
-    st.title("⚡ PASE TECH | SECURE LOGIN")
+if not st.session_state.auth_empire:
+    st.title("🛡️ PASE TECH | ENCRYPTED GATEWAY")
     with st.container():
-        col_l1, col_l2, col_l3 = st.columns([1,2,1])
-        with col_l2:
-            key = st.text_input("ENTER ACCESS KEY", type="password")
-            if st.button("VERIFY IDENTITY"):
-                if key == "vale": # CLAVE DE COMANDO
-                    st.session_state.auth = True
+        col_c, col_pass, col_r = st.columns([1,2,1])
+        with col_pass:
+            access_code = st.text_input("IDENTIFICATION REQUIRED", type="password")
+            if st.button("EXECUTE AUTHENTICATION"):
+                if access_code == "vale":
+                    st.session_state.auth_empire = True
+                    st.success("Welcome, Director.")
                     st.rerun()
-                else: st.error("INVALID KEY.")
+                else: st.error("ACCESS DENIED: LOGGING ATTEMPT.")
 else:
-    # --- DASHBOARD PRINCIPAL ---
-    st.sidebar.title("PASE TECH OPS")
-    st.sidebar.write(f"USER: **BRUNO**")
-    st.sidebar.write(f"SYSTEM: **ACTIVE**")
-    if st.sidebar.button("LOGOUT"):
-        st.session_state.auth = False
-        st.rerun()
+    # --- DASHBOARD CORPORATIVO ---
+    st.title("💎 PASE TECH: GLOBAL EMPIRE")
+    
+    tabs = st.tabs(["🏛️ TREASURY", "🧠 CFO AI", "📈 MARKETS", "🏢 REAL ESTATE", "📦 LOGISTICS", "⚖️ LEGAL", "🛡️ VAULT"])
 
-    tabs = st.tabs(["🧠 CORE AI", "💹 MARKET HUB", "🔒 VAULT", "🏢 REAL ESTATE", "🛰️ TACTICAL"])
-
-    # --- TAB 1: CORE AI ---
+    # --- TAB 1: TREASURY (LA BILLETERA VIRTUAL) ---
     with tabs[0]:
-        st.subheader("Neural Network Interface")
-        if 'chat' not in st.session_state: st.session_state.chat = []
-        for m in st.session_state.chat:
+        st.header("Executive Financial Summary")
+        
+        # Simulación de posesiones
+        m2_prop = st.sidebar.number_input("Tus Propiedades (m² totales)", 0, 10000, 250)
+        pais_p = st.sidebar.selectbox("Ubicación de Sede", list(DB_GLOBAL.keys()))
+        
+        total_net = calcular_patrimonio(MARKET_DATA, m2_prop, pais_p)
+        
+        c1, c2, c3 = st.columns(3)
+        c1.metric("ESTIMATED NET WORTH", f"USD {total_net:,.2f}")
+        c2.metric("LIQUID ASSETS", f"USD {sum(MARKET_DATA.values()):,.2f}")
+        c3.metric("TAX EFFICIENCY", f"{100 - DB_GLOBAL[pais_p]['Tax']}%", "Stable")
+        
+        st.write("### Composición del Imperio")
+        st.progress(min(int((sum(MARKET_DATA.values()) / total_net) * 100), 100), text="Liquidez vs Activos Fijos")
+        
+        # Fórmula Matemática en LaTeX
+        st.latex(r"Total\_Wealth = \sum_{i=1}^{n} (Asset_i \times Price_i) + (Area \times Price_{m2})")
+
+    # --- TAB 2: CFO AI (INTELIGENCIA FINANCIERA) ---
+    with tabs[1]:
+        st.header("Chief Financial Officer AI")
+        if 'chat_emp' not in st.session_state: st.session_state.chat_emp = []
+        for m in st.session_state.chat_emp:
             with st.chat_message(m["role"]): st.write(m["content"])
         
-        if p := st.chat_input("Enter strategic command..."):
-            st.session_state.chat.append({"role": "user", "content": p})
+        if p := st.chat_input("Consulta financiera o estratégica..."):
+            st.session_state.chat_emp.append({"role": "user", "content": p})
             with st.chat_message("user"): st.write(p)
-            ans = ia_logic(p)
-            st.session_state.chat.append({"role": "assistant", "content": ans})
-            with st.chat_message("assistant"): st.write(ans)
+            
+            # Lógica de respuesta mejorada
+            if "patrimonio" in p.lower() or "cuanto tengo" in p.lower():
+                r = f"Señor, su patrimonio actual es de USD {total_net:,.2f}. El 60% está concentrado en bienes raíces en {pais_p}."
+            elif "riesgo" in p.lower():
+                r = "Análisis: El riesgo es moderado. Sugiero mover un 10% de liquidez a ORO para cobertura ante inflación."
+            else:
+                r = "Procesando... Sugiero revisar la pestaña de MARKETS para optimizar sus entradas en activos tecnológicos."
+                
+            st.session_state.chat_emp.append({"role": "assistant", "content": r})
+            with st.chat_message("assistant"): st.write(r)
 
-    # --- TAB 2: MARKET HUB (EXCLUSIVO) ---
-    with tabs[1]:
-        st.subheader("Live Asset Monitoring")
-        m_col1, m_col2, m_col3, m_col4 = st.columns(4)
-        for i, (asset, price) in enumerate(STOCKS.items()):
-            change = random.uniform(-2, 2)
-            cols = [m_col1, m_col2, m_col3, m_col4]
-            cols[i].metric(asset, f"${price:,.2f}", f"{change:.2f}%")
-        
-        st.write("### Market Performance (Last 24h)")
-        st.area_chart([random.randint(100, 200) for _ in range(20)])
-
-    # --- TAB 3: THE VAULT ---
+    # --- TAB 3: MARKETS ---
     with tabs[2]:
-        st.subheader("Cybersecurity & Encryption")
-        v_col1, v_col2 = st.columns(2)
-        with v_col1:
-            st.write("Generador de Llaves de Acceso")
-            if st.button("GENERATE RSA KEY"):
-                key_gen = "".join(random.choices("ABCDEF0123456789", k=32))
-                st.code(key_gen, language='text')
-                st.toast("New key generated.")
-        with v_col2:
-            st.write("Digital Identity Hash")
-            raw_data = st.text_input("Input Data to Hash")
-            if raw_data:
-                st.code(hashlib.sha256(raw_data.encode()).hexdigest())
+        st.header("Real-Time Market Tracking")
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("BTC/USD", f"${MARKET_DATA['BTC']:,}", "+2.4%")
+        m2.metric("GOLD/OZ", f"${MARKET_DATA['GOLD']:,}", "-0.5%")
+        m3.metric("MSFT (Microsoft)", f"${MARKET_DATA['MSFT']}", "+1.2%")
+        m4.metric("SONY (Sony Corp)", f"${MARKET_DATA['SONY']}", "-0.8%")
+        st.line_chart([random.randint(400, 500) for _ in range(20)])
 
-    # --- TAB 4: REAL ESTATE PRO ---
+    # --- TAB 4: REAL ESTATE ---
     with tabs[3]:
-        st.subheader("Global Portfolio Management")
-        p_sel = st.selectbox("Market Selection", list(DB_GLOBAL.keys()))
-        m2 = st.number_input("Target Area (m²)", 50, 10000, 150)
-        
-        # Cálculo de ROI Simplificado
-        data = DB_GLOBAL[p_sel]
-        costo_total = (data['m2'] * m2) * (1 + data['Tax']/100)
-        
-        st.metric("Total Investment Value", f"USD {costo_total:,.0f}")
-        
-        st.write(f"**Risk Level:** {data['Risk']} | **Visa Path:** {data['Visa']}")
-        
-        # ROI Formula: $ROI = \frac{Ingresos - Costos}{Costos} \times 100$
-        st.write("Fórmula de Rentabilidad Aplicada:")
-        st.latex(r"ROI = \frac{Net\_Revenue}{Total\_Investment} \times 100")
+        st.header("Property & HQ Portfolio")
+        st.table(pd.DataFrame(DB_GLOBAL).T)
 
-    # --- TAB 5: TACTICAL & REPORTS ---
+    # --- TAB 5: LOGISTICS ---
     with tabs[4]:
-        st.subheader("Operational Intelligence")
-        st.write("Generación de Reportes de Inteligencia para Socios.")
-        
-        report_content = get_tactical_report()
-        st.download_button(
-            label="📄 EXPORT TACTICAL REPORT (TXT)",
-            data=report_content,
-            file_name=f"PASE_TECH_REPORT_{datetime.now().strftime('%Y%H%M')}.txt",
-            mime="text/plain"
-        )
-        
-        st.write("---")
-        st.write("Satellite Link Status")
-        st.progress(92, text="Signal Strength (Encrypted)")
-        st.image("https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=800")
+        st.header("Global Supply Chain")
+        st.info("Cargamento de 'Hardware Cuántico' llegando a Puerto de Montevideo en 48hs.")
+        st.progress(85, text="Transito: 85%")
+
+    # --- TAB 6: LEGAL ---
+    with tabs[5]:
+        st.header("Legal Compliance & Contracts")
+        if st.button("GENERAR NDA CORPORATIVO"):
+            st.code("NON-DISCLOSURE AGREEMENT (NDA)\nBETWEEN: PASE TECH CORP & [CONFIDENTIAL]\nTERMS: CLASS A ENFORCEMENT", language="text")
+
+    # --- TAB 7: VAULT ---
+    with tabs[6]:
+        st.header("Ultra-Secure Vault")
+        st.write("Generador de claves para acceso a servidores centrales.")
+        if st.button("GENERATE MILITARY GRADE KEY"):
+            key = hashlib.sha256(str(time.time()).encode()).hexdigest().upper()[:24]
+            st.code(key, language="text")
 
 st.divider()
-st.caption(f"PASE TECH GLOBAL SOLUTIONS | V13.0 | 2026 | BUILT FOR THE FUTURE.")
+st.caption(f"PASE TECH GLOBAL EMPIRE | Versión 15.0 | {datetime.now().year} | Designed for the Elite.")
+
